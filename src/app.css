@@ -1,0 +1,242 @@
+.custom-page {
+  width: 100%;
+  height: 100%;
+}
+
+.custom-page .tips-wrapper,
+.custom-page .loading-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.booking-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  background-color: #f5f5f5;
+}
+
+.booking-wrapper.book-success-tips-page {
+  background-color: #fff;
+}
+
+.btn-booking-new-container {
+  margin-top: 40px;
+}
+
+.theme-mode-dark .btn-book-now,
+.theme-mode-dark .btn-booking-new {
+  color: #ffff !important;
+}
+
+.booking-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  background-color: #fff;
+}
+
+.booking-header-dates-selector {
+  display: flex;
+  justify-content: flex-start;
+  height: auto;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.booking-header-dates-selector-year-month {
+  width: 140px;
+  flex: 0 0 140px;
+  padding: 0px 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-right: 1px solid #e0e0e0;
+}
+
+.booking-header-dates-selector-panel {
+  flex: 1;
+  align-items: center;
+  display: flex;
+  min-width: 0;
+}
+
+.booking-header-dates-selector-scroll-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.booking-header-dates-selector-dates {
+  flex: 1;
+  padding: 10px 0;
+  display: flex;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.booking-header-dates-selector-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 3px;
+  min-width: 100px;
+  height: 80px;
+}
+
+.booking-header-dates-selector-date:hover {
+  cursor: default;
+}
+
+.booking-header-dates-selector-date:not(.--selected):hover {
+  background-color: #efefef;
+  cursor: pointer;
+}
+
+.booking-header-dates-selector-date.--selected {
+  background-color: var(--btn-bg-color);
+}
+
+.booking-header-book-status:not(.fully-booked) {
+  color: var(--active-text-color);
+}
+
+.booking-header-book-status.fully-booked {
+  color: #bdbdbd
+}
+
+.theme-mode-dark .booking-header-dates-selector-date.--selected,
+.theme-mode-dark .booking-header-dates-selector-date.--selected .booking-header-book-status {
+  color: #fff;
+}
+
+.booking-header-dates-selector-date-week {
+  text-align: center;
+}
+
+.booking-header-dates-selector-date-day {
+  font-size: 12px;
+  font-weight: 400;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+}
+
+.booking-header-book-status-text {
+  font-size: 12px;
+}
+
+.booking-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.booking-body-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.booking-resources-container {
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 3px;
+}
+
+.booking-resource {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  align-items: center;
+}
+
+.booking-resource:last-child {
+  border-bottom: none;
+}
+
+.booking-resource:hover {
+  background-color: #f5f5f5;
+}
+
+.booking-resource-content {
+  flex: 1;
+  display: flex;
+}
+
+.booking-resource-name {
+  align-self: center;
+}
+
+.booking-badge-remaining {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  border-radius: 3px;
+  white-space: nowrap;
+  background-color: var(--btn-bg-color-40);
+  color: var(--active-text-color);
+  font-size: 12px;
+}
+
+.app-light-mode .booking-badge-remaining {
+  background-color: var(--btn-bg-color-70);
+}
+
+.booking-badge-remaining.fully-booked {
+  background-color: #efefef !important;
+  color: #666 !important;
+}
+
+.booking-badge-remaining:hover {
+  cursor: default;
+}
+
+.booking-resource-more-operations {
+  display: flex;
+  align-items: center;
+}
+
+.btn-book-now,
+.btn-booking-new {
+  border-color: var(--btn-bg-color) !important;
+  background-color: var(--btn-bg-color) !important;
+}
+
+.btn-book-now:hover,
+.btn-booking-new:hover {
+  border-color: var(--btn-hover-bg-color) !important;
+  background-color: var(--btn-hover-bg-color) !important;
+}
+
+.successfully-booking-tips {
+  flex-direction: column;
+}
+
+.successfully-booking-tips img {
+  width: 100px;
+}
+
+.successfully-booking-tips-text {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 20px;
+  margin-top: 20px;
+}
+
+.btn-booking-new-container {
+  margin-top: 40px;
+}

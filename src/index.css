@@ -1,0 +1,23 @@
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+/* hide Windows right scrollbar */
+body {
+  overflow-y: auto;
+}
+
+svg {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root,
+#wrapper {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  overflow: hidden;
+}

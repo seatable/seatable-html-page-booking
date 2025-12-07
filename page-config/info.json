@@ -1,0 +1,16 @@
+{
+  "name": "booking",
+  "version": "0.0.1",
+  "display_name": {
+    "de": "Buchung",
+    "en": "Booking",
+    "fr": "Réservation",
+    "zh-cn": "预定"
+  },
+  "description": {
+    "de": "Buchung",
+    "en": "Booking",
+    "fr": "Réservation",
+    "zh-cn": "预定"
+  }
+}

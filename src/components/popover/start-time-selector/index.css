@@ -1,0 +1,61 @@
+.selector-selected-container {
+  cursor: pointer;
+  position: relative;
+  min-height: 36px;
+}
+
+.selector-selected-container.form-control-active {
+  color: #495057;
+  background-color: #fff;
+  border-color: #1991eb;
+  outline: 0;
+  box-shadow: 0 0 0 2px rgb(70 127 207 / 25%);
+}
+
+.module-book-start-time-selector .selector-indicator-container {
+  color: hsl(0, 0%, 80%);
+  display: flex;
+  padding: 8px;
+  transition: color 150ms;
+  box-sizing: border-box;
+  position: absolute;
+  right: 1px;
+  top: 2px;
+}
+
+.module-book-start-time-selector .selector-indicator-container:hover {
+  color: hsl(0, 0%, 60%);
+}
+
+.module-book-start-time-selector-popover .popover {
+  min-width: calc(500px - 2rem);
+  height: fit-content;
+  margin-top: 0;
+}
+
+.module-book-start-time-selector-times-content {
+  overflow-y: scroll;
+}
+
+.module-book-start-time-selector-times {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 5px;
+}
+
+.module-book-start-time-selector-time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-basis: 20%;
+  padding: 5px;
+}
+
+.module-book-start-time-selector-time button {
+  width: 100%;
+}
+
+.module-book-start-time-selector-time.selected button,
+.module-book-start-time-selector-time.selected button:hover {
+  border-color: #ED7109;
+}
