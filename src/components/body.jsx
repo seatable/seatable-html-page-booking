@@ -1,7 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import intl from 'react-intl-universal';
 import BookDialog from '@components/dialog/book';
 
 const BookingBody = ({ resourceRows, selectedDate, getResourceName, getResourceDateStartTimes, submit }) => {
@@ -30,10 +29,10 @@ const BookingBody = ({ resourceRows, selectedDate, getResourceName, getResourceD
                 <div className="booking-resource" key={`booking-resource-${index}`}>
                   <div className="booking-resource-content">
                     <span className="booking-resource-name" title={resourceName}>{resourceName}</span>
-                    <span className={classnames('booking-badge-remaining ml-2 pl-1 pr-1', { 'fully-booked': isFullyBooked })}>{isFullyBooked ? intl.get('Fully_booked') : intl.get('Total_left_bookings', { number: startTimesLen })}</span>
+                    <span className={classnames('booking-badge-remaining ml-2 pl-1 pr-1', { 'fully-booked': isFullyBooked })}>{isFullyBooked ? '已约满' : `余 ${startTimesLen}`}</span>
                   </div>
                   <div className="booking-resource-more-operations ml-4">
-                    <button className={classnames('btn btn-book-now fw-normal', { 'disabled': isFullyBooked })} onClick={() => isFullyBooked ? {} : onToggleBook(resourceRow, startTimes)}>{intl.get('Book_now')}</button>
+                    <button className={classnames('btn btn-book-now fw-normal', { 'disabled': isFullyBooked })} onClick={() => isFullyBooked ? {} : onToggleBook(resourceRow, startTimes)}>{'现在预定'}</button>
                   </div>
                 </div>
               );

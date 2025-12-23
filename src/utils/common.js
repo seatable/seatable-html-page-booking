@@ -18,11 +18,3 @@ export const debounce = (fn, delay, immediate) => {
     }
   };
 };
-
-export const getMediaImageSrc = (imageName, server = null, appUuid = null) => {
-  const relativePath = `/media/images/${imageName}`;
-  if (isDev) {
-    return relativePath;
-  }
-  return `${server}/external-apps/${appUuid}/html-pages/booking/asset/?path=${relativePath}`;
-};

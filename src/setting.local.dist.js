@@ -1,11 +1,8 @@
 const config = {
-  username: '',
-  password: '',
-  lang: 'en',
   server: '',
   appUuid: '',
   accessToken: '',
-  appConfig: {}
+  pageId: '', // create an html page in universal app first
 };
 
 export default config;

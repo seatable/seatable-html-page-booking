@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import intl from 'react-intl-universal';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import isBetween from 'dayjs/plugin/isBetween';
@@ -8,14 +7,12 @@ import 'dayjs/locale/zh-cn';
 import 'dayjs/locale/de';
 import 'dayjs/locale/fr';
 import 'dayjs/locale/ru';
-import { DATE_FORMAT_MAP, DATE_UNIT, DEFAULT_DATE_FORMAT } from 'dtable-utils';
-import { DTableEmptyTip, Loading, toaster } from 'dtable-ui-component';
+import { DTableEmptyTip, toaster } from 'dtable-ui-component';
 import BookingHeader from '@components/header';
 import BookingBody from '@components/body';
 import { DATE_RANGE_TYPE, DEFAULT_DAY_RANGE, DEFAULT_TIME_INTERVAL } from '@constants/settings';
-import { INTERVALS_WEEK_KEY, MAX_START_TIME, TIME_FORMAT } from '@constants/dates';
-import { getMediaImageSrc } from './utils/common';
-import { useApp } from './hooks/app';
+import { DATE_FORMAT_MAP, DATE_UNIT, DEFAULT_DATE_FORMAT, INTERVALS_WEEK_KEY, MAX_START_TIME, TIME_FORMAT } from '@constants/dates';
+import noItemsTipImage from './assets/no-items-tip.png';
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
@@ -53,20 +50,20 @@ const getDayStartTimeObjs = (date, timeInterval) => {
 };
 
 const BookingContent = ({
-  getIntervals, getResources, getBookings,
+  intervalRows, resourceRows, bookingRows, fetchLatestBookings,
   getResourceName, getResourceRelatedIntervalsIds, getIntervalWeek, getIntervalStart, getIntervalEnd,
   getBookingRelatedResourceRowId, getBookingStartTime, getBookingEndTime, getBookingIsCanceled, addBooking,
   onBookSuccess,
 }) => {
-  const { server, appUuid } = useApp();
-  const [isLoading, setIsLoading] = useState(true);
-  const [intervalRows, setIntervalRows] = useState([]);
-  const [resourceRows, setResourceRows] = useState([]);
-  const [bookingRows, setBookingRows] = useState([]);
   const [selectedDate, setSelectedDate] = useState(dayjs());
 
-  const mountedRef = useRef(false);
-  const idIntervalRowMapRef = useRef({});
+  const idIntervalRowMap = useMemo(() => {
+    let map = {};
+    intervalRows.forEach((intervalRow) => {
+      map[intervalRow._id] = intervalRow;
+    });
+    return map;
+  }, [intervalRows]);
 
   const dateRangeType = useMemo(() => DATE_RANGE_TYPE.DAY_RANGE, []);
   const dayRange = useMemo(() => DEFAULT_DAY_RANGE, []);
@@ -144,7 +141,7 @@ const BookingContent = ({
 
   const idResourceWeekIntervalsMap = useMemo(() => {
     if (
-      isLoading || allDates.length === 0
+      allDates.length === 0
       || !Array.isArray(resourceRows) || resourceRows.length === 0
       || !Array.isArray(intervalRows) || intervalRows.length === 0
     ) {
@@ -155,7 +152,7 @@ const BookingContent = ({
       const relatedIntervalsIds = getResourceRelatedIntervalsIds(resourceRow);
       let weekIntervalsMap = {};
       relatedIntervalsIds.forEach((intervalId) => {
-        const intervalRow = idIntervalRowMapRef.current[intervalId];
+        const intervalRow = idIntervalRowMap[intervalId];
         const week = getIntervalWeek(intervalRow);
         const start_time = getIntervalStart(intervalRow);
         const end_time = getIntervalEnd(intervalRow);
@@ -171,10 +168,10 @@ const BookingContent = ({
       }
     });
     return intervalsMap;
-  }, [isLoading, resourceRows, intervalRows, allDates, getResourceRelatedIntervalsIds, getIntervalWeek, getIntervalStart, getIntervalEnd]);
+  }, [idIntervalRowMap, resourceRows, intervalRows, allDates, getResourceRelatedIntervalsIds, getIntervalWeek, getIntervalStart, getIntervalEnd]);
 
   const resourceAvailableStartTimesMap = useMemo(() => {
-    if (isLoading || Object.keys(idResourceWeekIntervalsMap).length === 0) return null;
+    if (Object.keys(idResourceWeekIntervalsMap).length === 0) return null;
     let resourceStartTimesMap = {};
     resourceRows.forEach((resourceRow) => {
       const weekDetails = idResourceWeekIntervalsMap[resourceRow._id];
@@ -200,7 +197,7 @@ const BookingContent = ({
       }
     });
     return resourceStartTimesMap;
-  }, [isLoading, resourceRows, bookingRows, idResourceWeekIntervalsMap, dateStartDateTimeObjsMap, checkIsBetweenIntervals, checkHasTimeBooked]);
+  }, [resourceRows, bookingRows, idResourceWeekIntervalsMap, dateStartDateTimeObjsMap, checkIsBetweenIntervals, checkHasTimeBooked]);
 
   const checkDateBookable = useCallback((dateObj) => {
     if (!resourceAvailableStartTimesMap) return false;
@@ -224,79 +221,15 @@ const BookingContent = ({
     setSelectedDate(date);
   }, [selectedDate]);
 
-  const loadAllIntervals = useCallback(async () => {
-    const res = await getIntervals(0, PER_PAGE_RECORDS_NUMBER);
-    if (!res) {
-      return;
-    }
-    const { results: perRows } = res.data || {};
-    let intervalRows = [];
-    if (Array.isArray(perRows) && perRows.length > 0) {
-      intervalRows = intervalRows.concat(perRows);
-    }
-    if (Array.isArray(perRows) && perRows.length === PER_PAGE_RECORDS_NUMBER) {
-      const res = await getIntervals(PER_PAGE_RECORDS_NUMBER, PER_PAGE_RECORDS_NUMBER);
-      const moreRows = res && res.data && res.data.results;
-      if (Array.isArray(moreRows) && moreRows.length > 0) {
-        intervalRows = intervalRows.concat(moreRows);
-      }
-    }
-    intervalRows.forEach((intervalRow) => {
-      idIntervalRowMapRef.current[intervalRow._id] = intervalRow;
-    });
-    setIntervalRows(intervalRows);
-  }, [getIntervals]);
-
-  const loadAllResources = useCallback(async () => {
-    const res = await getResources(0, PER_PAGE_RECORDS_NUMBER);
-    if (!res) {
-      return;
-    }
-    const { results: perRows } = res.data || {};
-    let resourceRows = [];
-    if (Array.isArray(perRows) && perRows.length > 0) {
-      resourceRows = resourceRows.concat(perRows);
-    }
-
-    if (Array.isArray(perRows) && perRows.length === PER_PAGE_RECORDS_NUMBER) {
-      const res = await getResources(PER_PAGE_RECORDS_NUMBER, PER_PAGE_RECORDS_NUMBER);
-      const moreRows = res && res.data && res.data.results;
-      if (Array.isArray(moreRows) && moreRows.length > 0) {
-        resourceRows = resourceRows.concat(moreRows);
-      }
-    }
-    setResourceRows(resourceRows);
-  }, [getResources]);
-
-  const fetchLatestBookings = useCallback(async () => {
-    const res = await getBookings({ start: 0, limit: PER_PAGE_RECORDS_NUMBER });
-    if (!res) return null;
-    const { results: perRows } = res.data || {};
-    let bookingRows = [];
-    if (Array.isArray(perRows) && perRows.length > 0) {
-      bookingRows = bookingRows.concat(perRows);
-    }
-    if (Array.isArray(perRows) && perRows.length === PER_PAGE_RECORDS_NUMBER) {
-      const res = await getBookings({ start: PER_PAGE_RECORDS_NUMBER, limit: PER_PAGE_RECORDS_NUMBER });
-      const moreRows = res && res.data && res.data.results;
-      if (Array.isArray(moreRows) && moreRows.length > 0) {
-        bookingRows = bookingRows.concat(moreRows);
-      }
-    }
-    return bookingRows;
-  }, [getBookings]);
-
-  const loadAllBookings = useCallback(async () => {
-    const bookingRows = await fetchLatestBookings();
-    if (bookingRows) {
-      setBookingRows(bookingRows);
-    }
-  }, [fetchLatestBookings]);
-
   const submit = useCallback(async ({ resourceRow, startTime }, bookSuccessCallback, bookFailedCallback) => {
     const selectedResourceRowId = resourceRow && resourceRow._id;
-    if (!selectedResourceRowId || !selectedDate || !startTime || checkHasTimeOut(startTime, timeInterval)) {
-      toaster.danger(intl.get('Not_bookable_interval'));
+    if (!selectedResourceRowId || !selectedDate || !startTime) {
+      toaster.danger('请选择可预约的时间段');
+      bookFailedCallback && bookFailedCallback();
+      return;
+    }
+    if (checkHasTimeOut(startTime, timeInterval)) {
+      toaster.danger('该时间段已被预定，请刷新后重试');
       bookFailedCallback && bookFailedCallback();
       return;
     }
@@ -305,7 +238,7 @@ const BookingContent = ({
     try {
       const latestBookingRows = await fetchLatestBookings();
       if (!latestBookingRows) {
-        toaster.danger(intl.get('Booking_failed'));
+        toaster.danger('预定失败，请刷新后重试');
         bookFailedCallback && bookFailedCallback();
         return;
       }
@@ -313,7 +246,7 @@ const BookingContent = ({
       // check if the selected time is still available with latest data
       const isTimeBooked = checkHasTimeBooked(startTime, resourceRow, latestBookingRows);
       if (isTimeBooked) {
-        toaster.danger(intl.get('Booking_failed'));
+        toaster.danger('该时间段已被预定，请刷新后重试');
         bookFailedCallback && bookFailedCallback();
         return;
       }
@@ -327,38 +260,24 @@ const BookingContent = ({
       onBookSuccess();
       bookSuccessCallback && bookSuccessCallback();
     } catch (error) {
+      toaster.danger('预定失败，请刷新后重试');
       bookFailedCallback && bookFailedCallback();
-      toaster.danger(intl.get('Booking_failed'));
     }
   }, [timeInterval, selectedDate, addBooking, onBookSuccess, fetchLatestBookings, checkHasTimeBooked]);
 
-  const init = useCallback(async () => {
-    await loadAllIntervals();
-    await loadAllResources();
-    await loadAllBookings();
-    setIsLoading(false);
-  }, [loadAllIntervals, loadAllResources, loadAllBookings]);
-
-  useEffect(() => {
-    if (!mountedRef.current) {
-      mountedRef.current = true;
-      init();
-    }
-  }, [init]);
 
   return (
     <div className="booking-content">
-      {isLoading && <div className="loading-wrapper"><Loading /></div>}
-      {(!isLoading && resourceRowsLen === 0) && (
+      {resourceRowsLen === 0 && (
         <div className="tips-wrapper">
           <DTableEmptyTip
-            src={getMediaImageSrc('no-items-tip.png', server, appUuid)}
+            src={noItemsTipImage}
             type='error'
-            text={intl.get('No_bookable_resources')}
+            text={'没有可预约资源'}
           />
         </div>
       )}
-      {(!isLoading && resourceRowsLen > 0) && (
+      {resourceRowsLen > 0 && (
         <>
           <BookingHeader
             allDates={allDates}
@@ -381,6 +300,10 @@ const BookingContent = ({
 };
 
 BookingContent.propTypes = {
+  intervalRows: PropTypes.array,
+  resourceRows: PropTypes.array,
+  bookingRows: PropTypes.array,
+  fetchLatestBookings: PropTypes.func,
   getIntervals: PropTypes.func,
   getResources: PropTypes.func,
   getBookings: PropTypes.func,

@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import intl from 'react-intl-universal';
 import { Modal, ModalBody, ModalFooter, Form, FormGroup, Label, Input, Button, Alert } from 'reactstrap';
 import dayjs from 'dayjs';
 import { DTableModalHeader, Loading } from 'dtable-ui-component';
-import { DEFAULT_DATE_FORMAT } from 'dtable-utils';
 import keyCodes from '@constants/key-codes';
 import BookStartTimeSelector from '../popover/start-time-selector';
+import { DEFAULT_DATE_FORMAT } from '@/constants/dates';
 
 const BookDialog = ({ resourceRow, selectedDate, times, getResourceName, toggle, submit }) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -28,7 +27,7 @@ const BookDialog = ({ resourceRow, selectedDate, times, getResourceName, toggle,
 
   const handleSubmit = useCallback(() => {
     if (!selectedStartTimeRef.current) {
-      setErrMessage(intl.get('Start_time_cannot_be_empty'));
+      setErrMessage('开始时间不能为空');
       return;
     }
 
@@ -56,15 +55,15 @@ const BookDialog = ({ resourceRow, selectedDate, times, getResourceName, toggle,
       toggle={toggle}
       className="book-dialog"
     >
-      <DTableModalHeader toggle={toggle}>{intl.get('Booking')}</DTableModalHeader>
+      <DTableModalHeader toggle={toggle}>{'预定'}</DTableModalHeader>
       <ModalBody>
         <Form>
           <FormGroup>
-            <Label for="new-book-resource-name">{intl.get('Name')}</Label>
+            <Label for="new-book-resource-name">{'名称'}</Label>
             <Input disabled id="new-book-resource-name" defaultValue={getResourceName(resourceRow)} />
           </FormGroup>
           <FormGroup>
-            <Label for="new-book-date">{intl.get('Date')}</Label>
+            <Label for="new-book-date">{'日期'}</Label>
             <Input disabled id="new-book-date" defaultValue={dayjs(selectedDate).format(DEFAULT_DATE_FORMAT)} />
           </FormGroup>
           <FormGroup>
@@ -74,10 +73,10 @@ const BookDialog = ({ resourceRow, selectedDate, times, getResourceName, toggle,
         {errMessage && <Alert color="danger" className="mt-2">{errMessage}</Alert>}
       </ModalBody>
       <ModalFooter>
-        <Button color="secondary" onClick={toggle}>{intl.get('Cancel')}</Button>
+        <Button color="secondary" onClick={toggle}>{'取消'}</Button>
         {isSaving ?
           <Button color="primary" disabled><Loading /></Button> :
-          <Button color="primary" onClick={handleSubmit}>{intl.get('Submit')}</Button>
+          <Button color="primary" onClick={handleSubmit}>{'提交'}</Button>
         }
       </ModalFooter>
     </Modal>

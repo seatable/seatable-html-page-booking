@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { DATE_UNIT } from 'dtable-utils';
+import { DATE_UNIT } from '@/constants/dates';
 
 export const checkHasTimeOut = (dateTime, timeInterval) => {
   // date time is behind of today

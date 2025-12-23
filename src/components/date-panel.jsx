@@ -2,11 +2,9 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 import classnames from 'classnames';
-import intl from 'react-intl-universal';
 import { IconButton } from 'dtable-ui-component';
-import { DATE_UNIT } from 'dtable-utils';
 import { debounce } from '@utils/common';
-import { useApp } from '@/hooks/app';
+import { DATE_UNIT } from '@/constants/dates';
 
 
 const NOT_AVAILABLE_SCROLL_DIRECTION = {
@@ -17,21 +15,18 @@ const NOT_AVAILABLE_SCROLL_DIRECTION = {
 
 const scrollStep = 300;
 
-const intlLocaleCulture = (culture) => {
-  return culture === 'en' ? 'en-gb' : culture;
-};
+const LANG = 'zh-cn';
 
-const getWeek = (date, lang) => {
-  if (dayjs().isSame(date, DATE_UNIT.DAY)) return intl.get('Today');
-  return dayjs(date).locale(intlLocaleCulture(lang)).format('ddd', 'en-gb');
+const getWeek = (date) => {
+  if (dayjs().isSame(date, DATE_UNIT.DAY)) return '今天';
+  return dayjs(date).locale(LANG).format('ddd', 'en-gb');
 };
 
 const Date = ({ dateObj, selectedDate, checkDateBookable, modifySelectedDate }) => {
-  const { lang } = useApp();
   const bookable = checkDateBookable(dateObj);
-  const week = getWeek(dateObj, lang);
+  const week = getWeek(dateObj);
   const day = dateObj.format('DD');
-  const bookStatus = bookable ? intl.get('Bookable') : intl.get('Fully_booked');
+  const bookStatus = bookable ? '可预约' : '已约满';
   return (
     <div
       className={classnames('booking-header-dates-selector-date p-2', { '--selected': dateObj.isSame(selectedDate, DATE_UNIT.DAY) })}
@@ -58,7 +53,6 @@ Date.propTypes = {
 };
 
 const DatePanel = ({ allDates, selectedDate, checkDateBookable, modifySelectedDate }) => {
-  const { lang } = useApp();
   const datesRef = useRef(null);
   const [scrollNotAvailable, setScrollNotAvailable] = useState(NOT_AVAILABLE_SCROLL_DIRECTION.BOTH);
   const handleManuallyScroll = (direction) => {
@@ -121,7 +115,7 @@ const DatePanel = ({ allDates, selectedDate, checkDateBookable, modifySelectedDa
 
   return (
     <div className="booking-header-dates-selector">
-      <div className="booking-header-dates-selector-year-month">{lang === 'zh-cn' ? selectedDate.format('YYYY 年 MM 月') : selectedDate.format(' YYYY - MM ')}</div>
+      <div className="booking-header-dates-selector-year-month">{selectedDate.format('YYYY 年 MM 月')}</div>
       <div className="booking-header-dates-selector-panel">
         <div className="booking-header-dates-selector-scroll-control booking-header-dates-selector-scroll-control-left-arrow p-1">
           <IconButton icon="left" disabled={scrollNotAvailable === NOT_AVAILABLE_SCROLL_DIRECTION.LEFT || scrollNotAvailable === NOT_AVAILABLE_SCROLL_DIRECTION.BOTH} onClick={() => handleManuallyScroll('left')} />

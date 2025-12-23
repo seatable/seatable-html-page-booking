@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import intl from 'react-intl-universal';
 import { Button, Label } from 'reactstrap';
 import classnames from 'classnames';
 import dayjs from 'dayjs';
@@ -86,7 +85,7 @@ const BookStartTimeSelector = ({ times, modifySelectedStartTime }) => {
 
   return (
     <div className="module-book-start-time-selector">
-      <Label>{intl.get('Start_time')}</Label>
+      <Label>{'开始时间'}</Label>
       <div
         ref={selectorSelectedContainerRef}
         className={`form-control ${isShowPopover ? 'form-control-active' : ''} selector-selected-container`}

@@ -1,6 +1,5 @@
 import { createRoot } from 'react-dom/client';
 import App from './app';
-import { AppProvider } from './hooks/app';
 import context from './context';
 
 import './index.css';
@@ -8,9 +7,7 @@ import './index.css';
 async function renderer() {
   await context.init();
   createRoot(document.getElementById('root')).render(
-    <AppProvider>
-      <App />
-    </AppProvider>
+    <App />
   );
 }
 

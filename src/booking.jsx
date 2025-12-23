@@ -1,16 +1,14 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import classnames from 'classnames';
-import intl from 'react-intl-universal';
 import { Button } from 'reactstrap';
-import { CellType, getTableByName, getTableColumnByName } from 'dtable-utils';
-import { DTableEmptyTip } from 'dtable-ui-component';
+import { DTableEmptyTip, Loading } from 'dtable-ui-component';
 import BookingContent from './content';
-import { useApp } from './hooks/app';
-import { checkHasMissingRequiredFields } from './utils/field';
 import { handleExecutionCostExceedError } from './utils/error-message';
 import context from './context';
 import successfullyBookingImage from './assets/booking-successfully.png';
-import { getMediaImageSrc } from './utils/common';
+import noItemsTipImage from './assets/no-items-tip.png';
+
+const PER_PAGE_RECORDS_NUMBER = 10000;
 
 /**
  * intervals table: Intervals
@@ -33,130 +31,136 @@ import { getMediaImageSrc } from './utils/common';
 
 const INTERVALS_TABLE_NAME = 'Intervals';
 const INTERVALS_REQUIRED_FIELDS = {
-  NAME: { name: 'name', type: CellType.TEXT },
-  WEEK: { name: 'week', type: CellType.TEXT },
-  START: { name: 'start', type: CellType.TEXT },
-  END: { name: 'end', type: CellType.TEXT },
+  NAME: { name: 'name', type: 'text' },
+  WEEK: { name: 'week', type: 'text' },
+  START: { name: 'start', type: 'text' },
+  END: { name: 'end', type: 'text' },
 };
 
 const RESOURCES_TABLE_NAME = 'Resources';
 const RESOURCES_REQUIRED_FIELDS = {
-  NAME: { name: 'name', type: CellType.TEXT },
-  INTERVALS: { name: 'intervals', type: CellType.LINK },
+  NAME: { name: 'name', type: 'text' },
+  INTERVALS: { name: 'intervals', type: 'link' },
 };
 
 const BOOKINGS_TABLE_NAME = 'Bookings';
 const BOOKINGS_REQUIRED_FIELDS = {
-  NAME: { name: 'name', type: CellType.TEXT },
-  START_TIME: { name: 'start_time', type: CellType.DATE },
-  END_TIME: { name: 'end_time', type: CellType.DATE },
-  RESOURCE: { name: 'resource', type: CellType.LINK },
-  IS_CANCELED: { name: 'is_canceled', type: CellType.CHECKBOX },
+  NAME: { name: 'name', type: 'text' },
+  START_TIME: { name: 'start_time', type: 'date' },
+  END_TIME: { name: 'end_time', type: 'date' },
+  RESOURCE: { name: 'resource', type: 'link' },
+  IS_CANCELED: { name: 'is_canceled', type: 'checkbox' },
 };
 
-const getRequiredField = ({ name, type }, table) => {
-  const column = getTableColumnByName(table, name);
+const getTableColumnByName = (table, columnName) => {
+  if (!table || !Array.isArray(table.columns) || !columnName) return null;
+  return table.columns.find(function (column) {
+    return column.name === columnName;
+  });
+};
+
+const getRequiredField = ({ name, type }, columns) => {
+  const column = getTableColumnByName({ columns }, name);
   return column && column.type === type ? column : null;
 };
 
+const checkHasMissingRequiredFields = (fields) => {
+  if (!Array.isArray(fields) || fields.length === 0) return true;
+  const validFields = fields.filter((field) => !!field.column);
+  if (validFields.length < fields.length) return true;
+  return validFields.some((filed) => {
+    return filed.column.type !== filed.required_type;
+  });
+};
+
 const Booking = () => {
-  const { tables, server, appUuid } = useApp();
+  const [isLoading, setIsLoading] = useState(true);
+  const [intervalRows, setIntervalRows] = useState([]);
+  const [intervalColumns, setIntervalColumns] = useState([]);
+  const [resourceRows, setResourceRows] = useState([]);
+  const [resourceColumns, setResourceColumns] = useState([]);
+  const [bookingRows, setBookingRows] = useState([]);
+  const [bookingColumns, setBookingColumns] = useState([]);
   const [isShowBookSuccess, setIsShowBookSuccess] = useState(false);
 
+  const mountedRef = useRef(false);
+
   // intervals table
-  const intervalsTable = getTableByName(tables, INTERVALS_TABLE_NAME);
   const intervalsNameColumn = useMemo(
-    () => getRequiredField(INTERVALS_REQUIRED_FIELDS.NAME, intervalsTable),
-    [intervalsTable]
+    () => getRequiredField(INTERVALS_REQUIRED_FIELDS.NAME, intervalColumns),
+    [intervalColumns]
   );
   const intervalsWeekColumn = useMemo(
-    () => getRequiredField(INTERVALS_REQUIRED_FIELDS.WEEK, intervalsTable),
-    [intervalsTable]
+    () => getRequiredField(INTERVALS_REQUIRED_FIELDS.WEEK, intervalColumns),
+    [intervalColumns]
   );
   const intervalsStartColumn = useMemo(
-    () => getRequiredField(INTERVALS_REQUIRED_FIELDS.START, intervalsTable),
-    [intervalsTable]
+    () => getRequiredField(INTERVALS_REQUIRED_FIELDS.START, intervalColumns),
+    [intervalColumns]
   );
   const intervalsEndColumn = useMemo(
-    () => getRequiredField(INTERVALS_REQUIRED_FIELDS.END, intervalsTable),
-    [intervalsTable]
+    () => getRequiredField(INTERVALS_REQUIRED_FIELDS.END, intervalColumns),
+    [intervalColumns]
   );
 
   // resources table
-  const resourcesTable = useMemo(
-    () => getTableByName(tables, RESOURCES_TABLE_NAME),
-    [tables]
-  );
   const resourcesNameColumn = useMemo(
-    () => getRequiredField(RESOURCES_REQUIRED_FIELDS.NAME, resourcesTable),
-    [resourcesTable]
+    () => getRequiredField(RESOURCES_REQUIRED_FIELDS.NAME, resourceColumns),
+    [resourceColumns]
   );
   const resourcesRelatedIntervalsColumn = useMemo(
-    () => getRequiredField(RESOURCES_REQUIRED_FIELDS.INTERVALS, resourcesTable),
-    [resourcesTable]
+    () => getRequiredField(RESOURCES_REQUIRED_FIELDS.INTERVALS, resourceColumns),
+    [resourceColumns]
   );
 
   // bookings table
-  const bookingsTable = useMemo(
-    () => getTableByName(tables, BOOKINGS_TABLE_NAME),
-    [tables]
-  );
   const bookingsNameColumn = useMemo(
-    () => getRequiredField(BOOKINGS_REQUIRED_FIELDS.NAME, bookingsTable),
-    [bookingsTable]
+    () => getRequiredField(BOOKINGS_REQUIRED_FIELDS.NAME, bookingColumns),
+    [bookingColumns]
   );
   const bookingsStartTimeColumn = useMemo(
-    () => getRequiredField(BOOKINGS_REQUIRED_FIELDS.START_TIME, bookingsTable),
-    [bookingsTable]
+    () => getRequiredField(BOOKINGS_REQUIRED_FIELDS.START_TIME, bookingColumns),
+    [bookingColumns]
   );
   const bookingsEndTimeColumn = useMemo(
-    () => getRequiredField(BOOKINGS_REQUIRED_FIELDS.END_TIME, bookingsTable),
-    [bookingsTable]
+    () => getRequiredField(BOOKINGS_REQUIRED_FIELDS.END_TIME, bookingColumns),
+    [bookingColumns]
   );
   const bookingsRelatedResourceColumn = useMemo(
-    () => getRequiredField(BOOKINGS_REQUIRED_FIELDS.RESOURCE, bookingsTable),
-    [bookingsTable]
+    () => getRequiredField(BOOKINGS_REQUIRED_FIELDS.RESOURCE, bookingColumns),
+    [bookingColumns]
   );
   const bookingsIsCanceledColumn = useMemo(
-    () => getRequiredField(BOOKINGS_REQUIRED_FIELDS.IS_CANCELED, bookingsTable),
-    [bookingsTable]
+    () => getRequiredField(BOOKINGS_REQUIRED_FIELDS.IS_CANCELED, bookingColumns),
+    [bookingColumns]
   );
 
   const hasMissingRequiredFields = useMemo(() => {
+    if (isLoading) return false;
     return (
       checkHasMissingRequiredFields([
-        { column: intervalsNameColumn, required_type: CellType.TEXT },
-        { column: intervalsWeekColumn, required_type: CellType.TEXT },
-        { column: intervalsStartColumn, required_type: CellType.TEXT },
-        { column: intervalsEndColumn, required_type: CellType.TEXT },
+        { column: intervalsNameColumn, required_type: 'text' },
+        { column: intervalsWeekColumn, required_type: 'text' },
+        { column: intervalsStartColumn, required_type: 'text' },
+        { column: intervalsEndColumn, required_type: 'text' },
       ]) ||
       checkHasMissingRequiredFields([
-        { column: resourcesNameColumn, required_type: CellType.TEXT },
-        {
-          column: resourcesRelatedIntervalsColumn,
-          required_type: CellType.LINK,
-        },
+        { column: resourcesNameColumn, required_type: 'text' },
+        { column: resourcesRelatedIntervalsColumn, required_type: 'link' },
       ]) ||
       checkHasMissingRequiredFields([
-        { column: bookingsNameColumn, required_type: CellType.TEXT },
-        { column: bookingsStartTimeColumn, required_type: CellType.DATE },
-        { column: bookingsEndTimeColumn, required_type: CellType.DATE },
-        { column: bookingsRelatedResourceColumn, required_type: CellType.LINK },
-        { column: bookingsIsCanceledColumn, required_type: CellType.CHECKBOX },
+        { column: bookingsNameColumn, required_type: 'text' },
+        { column: bookingsStartTimeColumn, required_type: 'date' },
+        { column: bookingsEndTimeColumn, required_type: 'date' },
+        { column: bookingsRelatedResourceColumn, required_type: 'link' },
+        { column: bookingsIsCanceledColumn, required_type: 'checkbox' },
       ])
     );
   }, [
-    intervalsNameColumn,
-    intervalsWeekColumn,
-    intervalsStartColumn,
-    intervalsEndColumn,
-    resourcesNameColumn,
-    resourcesRelatedIntervalsColumn,
-    bookingsNameColumn,
-    bookingsStartTimeColumn,
-    bookingsEndTimeColumn,
-    bookingsRelatedResourceColumn,
-    bookingsIsCanceledColumn,
+    isLoading,
+    intervalsNameColumn, intervalsWeekColumn, intervalsStartColumn, intervalsEndColumn,
+    resourcesNameColumn, resourcesRelatedIntervalsColumn,
+    bookingsNameColumn, bookingsStartTimeColumn, bookingsEndTimeColumn, bookingsRelatedResourceColumn, bookingsIsCanceledColumn,
   ]);
 
   const getResourceName = useCallback(
@@ -231,7 +235,7 @@ const Booking = () => {
 
   const getIntervals = useCallback((start, limit) => {
     try {
-      return context.getRows(INTERVALS_TABLE_NAME, start, limit);
+      return context.listRows({ tableName: INTERVALS_TABLE_NAME, start, limit });
     } catch (error) {
       handleExecutionCostExceedError(error);
       return null;
@@ -240,7 +244,7 @@ const Booking = () => {
 
   const getResources = useCallback((start, limit) => {
     try {
-      return context.getRows(RESOURCES_TABLE_NAME, start, limit);
+      return context.listRows({ tableName: RESOURCES_TABLE_NAME, start, limit });
     } catch (error) {
       handleExecutionCostExceedError(error);
       return null;
@@ -249,7 +253,7 @@ const Booking = () => {
 
   const getBookings = useCallback(({ start, limit }) => {
     try {
-      return context.getRows(BOOKINGS_TABLE_NAME, start, limit);
+      return context.listRows({ tableName: BOOKINGS_TABLE_NAME, start, limit });
     } catch (error) {
       handleExecutionCostExceedError(error);
       return null;
@@ -260,20 +264,19 @@ const Booking = () => {
     async (startTime, endTime, resourceRowId) => {
       const linkId = bookingsRelatedResourceColumn.data?.link_id;
       if (!linkId) return;
-      const username = await context.getAppSetting('name');
       const rowData = {
-        [bookingsNameColumn.name]: username,
+        [bookingsNameColumn.name]: '',
         [bookingsStartTimeColumn.name]: startTime,
         [bookingsEndTimeColumn.name]: endTime,
       };
-      const linkRows = [
+      const rowLinksData = [
         {
           link_id: linkId,
           other_table_name: RESOURCES_TABLE_NAME,
           row_ids: [resourceRowId],
         },
       ];
-      return context.addRow(BOOKINGS_TABLE_NAME, rowData, linkRows);
+      return context.addRow({ tableName: BOOKINGS_TABLE_NAME, rowData, rowLinksData });
     },
     [
       bookingsNameColumn,
@@ -283,39 +286,125 @@ const Booking = () => {
     ]
   );
 
+  const loadAllIntervals = useCallback(async () => {
+    const res = await getIntervals(0, PER_PAGE_RECORDS_NUMBER);
+    if (!res) {
+      return;
+    }
+    const { results: perRows, metadata } = res.data || {};
+    let intervalRows = [];
+    if (Array.isArray(perRows) && perRows.length > 0) {
+      intervalRows = intervalRows.concat(perRows);
+    }
+    if (Array.isArray(perRows) && perRows.length === PER_PAGE_RECORDS_NUMBER) {
+      const res = await getIntervals(PER_PAGE_RECORDS_NUMBER, PER_PAGE_RECORDS_NUMBER);
+      const moreRows = res && res.data && res.data.results;
+      if (Array.isArray(moreRows) && moreRows.length > 0) {
+        intervalRows = intervalRows.concat(moreRows);
+      }
+    }
+    setIntervalRows(intervalRows);
+    setIntervalColumns(metadata || []);
+  }, [getIntervals]);
+
+  const loadAllResources = useCallback(async () => {
+    const res = await getResources(0, PER_PAGE_RECORDS_NUMBER);
+    if (!res) {
+      return;
+    }
+    const { results: perRows, metadata } = res.data || {};
+    let resourceRows = [];
+    if (Array.isArray(perRows) && perRows.length > 0) {
+      resourceRows = resourceRows.concat(perRows);
+    }
+
+    if (Array.isArray(perRows) && perRows.length === PER_PAGE_RECORDS_NUMBER) {
+      const res = await getResources(PER_PAGE_RECORDS_NUMBER, PER_PAGE_RECORDS_NUMBER);
+      const moreRows = res && res.data && res.data.results;
+      if (Array.isArray(moreRows) && moreRows.length > 0) {
+        resourceRows = resourceRows.concat(moreRows);
+      }
+    }
+    setResourceRows(resourceRows);
+    setResourceColumns(metadata || []);
+  }, [getResources]);
+
+  const fetchLatestBookings = useCallback(async () => {
+    const res = await getBookings({ start: 0, limit: PER_PAGE_RECORDS_NUMBER });
+    if (!res) return { rows: [], columns: [] };
+    const { results: perRows, metadata } = res.data || {};
+    let bookingRows = [];
+    if (Array.isArray(perRows) && perRows.length > 0) {
+      bookingRows = bookingRows.concat(perRows);
+    }
+    if (Array.isArray(perRows) && perRows.length === PER_PAGE_RECORDS_NUMBER) {
+      const res = await getBookings({ start: PER_PAGE_RECORDS_NUMBER, limit: PER_PAGE_RECORDS_NUMBER });
+      const moreRows = res && res.data && res.data.results;
+      if (Array.isArray(moreRows) && moreRows.length > 0) {
+        bookingRows = bookingRows.concat(moreRows);
+      }
+    }
+    return { rows: bookingRows, columns: metadata || [] };
+  }, [getBookings]);
+
+  const loadAllBookings = useCallback(async () => {
+    const { rows, columns } = await fetchLatestBookings() || {};
+    setBookingRows(rows);
+    setBookingColumns(columns);
+  }, [fetchLatestBookings]);
+
+
+  const init = useCallback(async () => {
+    await loadAllIntervals();
+    await loadAllResources();
+    await loadAllBookings();
+    setIsLoading(false);
+  }, [loadAllIntervals, loadAllResources, loadAllBookings]);
+
   const onBookSuccess = useCallback(() => {
     setIsShowBookSuccess(true);
   }, []);
 
   const onBookingNew = useCallback(() => {
     setIsShowBookSuccess(false);
-  }, []);
+    setIsLoading(true);
+    init();
+  }, [init]);
+
+  useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      init();
+    }
+  }, [init]);
 
   return (
     <div className={classnames('booking-wrapper', { 'book-success-tips-page': isShowBookSuccess })}>
       {hasMissingRequiredFields && (
         <div className="tips-wrapper">
           <DTableEmptyTip
-            src={getMediaImageSrc('no-items-tip.png', server, appUuid)}
+            src={noItemsTipImage}
             type="error"
-            text={intl.get('Page_unavailable')}
+            text={'当前页面无法访问。请联系管理员。'}
           />
         </div>
       )}
       {isShowBookSuccess && (
         <div className="tips-wrapper successfully-booking-tips">
-          <img alt={intl.get('Successfully_booking')} src={successfullyBookingImage} />
-          <p className="successfully-booking-tips-text">{intl.get('Successfully_booking')}</p>
+          <img alt={'预约成功'} src={successfullyBookingImage} />
+          <p className="successfully-booking-tips-text">{'预约成功'}</p>
           <div className="btn-booking-new-container">
-            <Button className="btn-booking-new" onClick={onBookingNew}>{intl.get('Booking_a_new_one')}</Button>
+            <Button className="btn-booking-new" onClick={onBookingNew}>{'再次预约'}</Button>
           </div>
         </div>
       )}
-      {!hasMissingRequiredFields && !isShowBookSuccess && (
+      {(isLoading && !isShowBookSuccess) && <div className="loading-wrapper"><Loading /></div>}
+      {(!isLoading && !isShowBookSuccess) && (
         <BookingContent
-          getIntervals={getIntervals}
-          getResources={getResources}
-          getBookings={getBookings}
+          intervalRows={intervalRows}
+          resourceRows={resourceRows}
+          bookingRows={bookingRows}
+          fetchLatestBookings={fetchLatestBookings}
           getResourceName={getResourceName}
           getResourceRelatedIntervalsIds={getResourceRelatedIntervalsIds}
           getIntervalWeek={getIntervalWeek}

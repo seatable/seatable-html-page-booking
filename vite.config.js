@@ -1,24 +1,23 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import viteCustomPluginImport from './vite-custom-plugin-import';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import viteCustomPluginImport from './vite-custom-plugin-import';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig(() => {
   return {
+    base: './',
     build: {
-      cssCodeSplit: false, // merge styles to a css file
       rollupOptions: {
         output: {
-          format: 'iife', // 打包为 IIFE 格式，不需要 type="module"
-          entryFileNames: 'js/[name]-[hash].js',
-          chunkFileNames: 'js/[name]-[hash].js',
+          entryFileNames: '[name]-[hash].js',
+          chunkFileNames: '[name]-[hash].js',
           assetFileNames: (assetInfo) => {
             if (assetInfo.names?.[0]?.endsWith('.css')) {
-              return 'css/[name]-[hash][extname]';
+              return '[name]-[hash][extname]';
             }
             return 'assets/[name]-[hash][extname]';
           },
