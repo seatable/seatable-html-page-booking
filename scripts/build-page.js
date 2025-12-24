@@ -49,10 +49,10 @@ zip.generateAsync({ type: 'nodebuffer' }).then(function (content) {
   let zip = `${packageInfoContent.name}-${packageInfoContent.version}.zip`;
   fs.writeFile(pageZipPath + '/' + zip, content, function (err) {
     if (err) {
-      console.log(zip + ' failed');
+      console.log('Create' + zip + ' failed');
       console.log(err);
       return;
     }
-    console.log(zip + ' successful');
+    console.log('Create' + zip + ' successful');
   });
 });
