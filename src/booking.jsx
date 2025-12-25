@@ -262,20 +262,17 @@ const Booking = () => {
 
   const addBooking = useCallback(
     async (startTime, endTime, resourceRowId) => {
-      const linkId = bookingsRelatedResourceColumn.data?.link_id;
-      if (!linkId) return;
+      const linkColumnName = bookingsRelatedResourceColumn.name;
+      if (!linkColumnName) return;
       const rowData = {
         [bookingsNameColumn.name]: '',
         [bookingsStartTimeColumn.name]: startTime,
         [bookingsEndTimeColumn.name]: endTime,
       };
-      const rowLinksData = [
-        {
-          link_id: linkId,
-          other_table_name: RESOURCES_TABLE_NAME,
-          row_ids: [resourceRowId],
-        },
-      ];
+      const rowLinksData = [{
+        link_column_name: linkColumnName,
+        other_rows_ids: [resourceRowId],
+      }];
       return context.addRow({ tableName: BOOKINGS_TABLE_NAME, rowData, rowLinksData });
     },
     [

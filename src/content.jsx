@@ -26,7 +26,6 @@ const DAY_WEEK_KEY_MAP = {
   6: INTERVALS_WEEK_KEY.SATURDAY,
   7: INTERVALS_WEEK_KEY.SUNDAY,
 };
-const PER_PAGE_RECORDS_NUMBER = 10000;
 
 export const checkHasTimeOut = (dateTime, timeInterval) => {
   // date time is behind of today
