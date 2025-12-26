@@ -2,7 +2,6 @@ import JSZip from 'jszip';
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
-import dayjs from 'dayjs';
 
 /**
  * Get file content
