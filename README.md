@@ -42,3 +42,15 @@ Required fields:
 | end         | text     | end time. format: e.g. '18:00'        |
 | is_canceled | checkbox | whether the booking has been canceled |
 | resource    | link     | linked to Resources                   |
+
+## Build page
+
+1. Update the version in `package.json`
+
+2. Run the following command to build the page
+
+```bash
+npm run build-page
+```
+
+3. The page is built in `page-zip` directory

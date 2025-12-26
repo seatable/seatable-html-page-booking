@@ -233,27 +233,27 @@ const Booking = () => {
     [bookingsIsCanceledColumn]
   );
 
-  const getIntervals = useCallback((start, limit) => {
+  const getIntervals = useCallback(async (start, limit) => {
     try {
-      return context.listRows({ tableName: INTERVALS_TABLE_NAME, start, limit });
+      return await context.listRows({ tableName: INTERVALS_TABLE_NAME, start, limit });
     } catch (error) {
       handleExecutionCostExceedError(error);
       return null;
     }
   }, []);
 
-  const getResources = useCallback((start, limit) => {
+  const getResources = useCallback(async (start, limit) => {
     try {
-      return context.listRows({ tableName: RESOURCES_TABLE_NAME, start, limit });
+      return await context.listRows({ tableName: RESOURCES_TABLE_NAME, start, limit });
     } catch (error) {
       handleExecutionCostExceedError(error);
       return null;
     }
   }, []);
 
-  const getBookings = useCallback(({ start, limit }) => {
+  const getBookings = useCallback(async ({ start, limit }) => {
     try {
-      return context.listRows({ tableName: BOOKINGS_TABLE_NAME, start, limit });
+      return await context.listRows({ tableName: BOOKINGS_TABLE_NAME, start, limit });
     } catch (error) {
       handleExecutionCostExceedError(error);
       return null;
