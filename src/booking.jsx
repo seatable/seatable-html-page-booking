@@ -396,7 +396,7 @@ const Booking = () => {
         </div>
       )}
       {(isLoading && !isShowBookSuccess) && <div className="loading-wrapper"><Loading /></div>}
-      {(!isLoading && !isShowBookSuccess) && (
+      {(!isLoading && !hasMissingRequiredFields && !isShowBookSuccess) && (
         <BookingContent
           intervalRows={intervalRows}
           resourceRows={resourceRows}
