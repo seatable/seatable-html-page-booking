@@ -7,7 +7,7 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 
 export default [
   {
-    ignores: ['dist', 'node_modules', 'src/setting.local.*', 'src/locales/lang/**/*'],
+    ignores: ['dist', 'node_modules'],
   },
   {
     files: ['**/*.{js,jsx}'],
@@ -27,7 +27,6 @@ export default [
       'jsx-a11y': jsxA11y,
     },
     ignores: [
-      '/src/setting.js',
       '/src/setting.local.dist.js',
       '/src/setting.local.js',
     ],

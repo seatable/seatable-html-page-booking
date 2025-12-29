@@ -1,7 +1,3 @@
-import context from '@/context';
-
-const isDev = import.meta.env.DEV;
-
 export const debounce = (fn, delay, immediate) => {
   let timer = null;
   return (...params) => {
