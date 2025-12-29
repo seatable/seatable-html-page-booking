@@ -12,12 +12,10 @@ async function renderer() {
 }
 
 if (import.meta.env.DEV) {
-  import('./setting.local').then((module) => {
-    const localSettings = Object.values(module)[0];
-    console.log('Loaded local settings:', localSettings);
-    context.config = localSettings;
-    renderer();
-  });
+  const localSettings = window.__HTML_PAGE_DEV_CONFIG__;
+  console.log('Loaded local settings:', localSettings);
+  context.config = localSettings;
+  renderer();
 } else {
   renderer();
 }

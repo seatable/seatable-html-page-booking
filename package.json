@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "description": "View availability and book instantly.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -10,6 +11,18 @@
     "clean": "rm -rf page-zip && mkdir page-zip",
     "build-page": "npm run clean && npm run build && node scripts/build-page.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seatable/seatable-html-page-booking"
+  },
+  "bugs": {
+    "url": "https://github.com/seatable/seatable-html-page-booking/issues"
+  },
+  "keywords": [
+    "HTML page",
+    "booking"
+  ],
+  "author": "SeaTable",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -29,7 +42,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "reactstrap": "9.2.3",
-    "seatable-html-page-sdk": "^0.0.1"
+    "seatable-html-page-sdk": "^0.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

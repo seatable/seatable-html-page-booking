@@ -43,6 +43,27 @@ Required fields:
 | is_canceled | checkbox | whether the booking has been canceled |
 | resource    | link     | linked to Resources                   |
 
+## Development
+
+1. Install dependencies
+
+2. Add `/src/setting.local.js` (optional)
+
+```js
+export default {
+  server: "",
+  appUuid: "",
+  accessToken: "",
+  pageId: "", // create an html page in universal app first
+};
+```
+
+3. Run the following command to start the development server
+
+```bash
+npm run dev
+```
+
 ## Build page
 
 1. Update the version in `package.json`
