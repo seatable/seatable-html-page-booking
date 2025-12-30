@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import eslint from 'vite-plugin-eslint';
 import viteCustomPluginImport from './vite-custom-plugin-import';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -16,19 +17,30 @@ const getTimestamp = () => {
   });
 };
 
+const loadLocalSettings = async () => {
+  try {
+    await fs.promises.access(path.resolve(__dirname, './src/setting.local.js'));
+  } catch (e) {
+    console.log(`${getTimestamp()} \x1b[33m[vite]\x1b[0m No local settings file is applied.`);
+    return null;
+  }
+  try {
+    const configModule = await import('./src/setting.local.js');
+    return Object.values(configModule)[0];
+  } catch (e) {
+    console.log(`${getTimestamp()} \x1b[33m[vite]\x1b[0m Load local settings file failed.`);
+    return null;
+  }
+};
+
 // https://vite.dev/config/
 export default defineConfig(async ({ mode }) => {
   const isDev = mode === 'development';
   let devConfigs = null;
   if (isDev) {
-    try {
-      await fs.promises.access(path.resolve(__dirname, './src/setting.local.js'));
-      const configModule = await import('./src/setting.local');
-      devConfigs = Object.values(configModule)[0];
-    } catch (e) {
-      console.log(`${getTimestamp()} \x1b[33m[vite]\x1b[0m No local settings file is applied.`);
-    }
+    devConfigs = await loadLocalSettings();
   }
+
   return {
     base: './',
     root: './src',
@@ -46,9 +58,17 @@ export default defineConfig(async ({ mode }) => {
             }
             return 'assets/[name]-[hash][extname]';
           },
+          // split vendor chunks if has chunk size warning limit
+          // manualChunks(id) {
+          //   if (id.includes('node_modules')) {
+          //     if (id.includes('react') || id.includes('react-dom')) return 'react';
+          //     return null;
+          //   }
+          // }
         },
       },
       assetsInlineLimit: 4 * 1024, // default is 4KB
+      chunkSizeWarningLimit: 1000,
     },
     plugins: [
       {
@@ -74,6 +94,14 @@ export default defineConfig(async ({ mode }) => {
         libraryDirectory: 'lib',
         camel2DashComponentName: false,
         camel2UnderlineComponentName: false,
+      }),
+      eslint({
+        cache: false,
+        lintOnStart: true,
+        emitWarning: true,
+        emitError: true,
+        failOnError: false,
+        include: ['src/**/*.{js,ts,vue,jsx,tsx}'],
       }),
     ],
     resolve: {

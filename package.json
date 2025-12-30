@@ -58,6 +58,7 @@
     "jszip": "^3.10.1",
     "prop-types": "^15.8.1",
     "react-i18next": "^16.2.3",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "vite-plugin-eslint": "^1.8.1"
   }
 }

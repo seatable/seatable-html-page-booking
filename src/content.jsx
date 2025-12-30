@@ -260,7 +260,7 @@ const BookingContent = ({
       bookSuccessCallback && bookSuccessCallback();
     } catch (error) {
       toaster.danger('预定失败，请刷新后重试');
-      bookFailedCallback && bookFailedCallback();
+      bookFailedCallback && bookFailedCallback(error);
     }
   }, [timeInterval, selectedDate, addBooking, onBookSuccess, fetchLatestBookings, checkHasTimeBooked]);
 
