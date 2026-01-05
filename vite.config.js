@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import path, { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import eslint from 'vite-plugin-eslint';
@@ -18,14 +18,15 @@ const getTimestamp = () => {
 };
 
 const loadLocalSettings = async () => {
+  const settingPath = path.resolve(__dirname, './src/setting.local.dist.js');
   try {
-    await fs.promises.access(path.resolve(__dirname, './src/setting.local.js'));
+    await fs.promises.access(path.resolve(__dirname, settingPath));
   } catch (e) {
     console.log(`${getTimestamp()} \x1b[33m[vite]\x1b[0m No local settings file is applied.`);
     return null;
   }
   try {
-    const configModule = await import('./src/setting.local.js');
+    const configModule = await import(settingPath);
     return Object.values(configModule)[0];
   } catch (e) {
     console.log(`${getTimestamp()} \x1b[33m[vite]\x1b[0m Load local settings file failed.`);
@@ -44,9 +45,9 @@ export default defineConfig(async ({ mode }) => {
   return {
     base: './',
     root: './src',
-    publicDir: '../public',
+    publicDir: resolve(__dirname, 'public'),
     build: {
-      outDir: '../dist',
+      outDir: resolve(__dirname, 'dist'),
       emptyOutDir: true,
       rollupOptions: {
         output: {
