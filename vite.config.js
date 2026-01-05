@@ -18,9 +18,9 @@ const getTimestamp = () => {
 };
 
 const loadLocalSettings = async () => {
-  const settingPath = path.resolve(__dirname, './src/setting.local.dist.js');
+  const settingPath = path.resolve(__dirname, './src/setting.js');
   try {
-    await fs.promises.access(path.resolve(__dirname, settingPath));
+    await fs.promises.access(settingPath);
   } catch (e) {
     console.log(`${getTimestamp()} \x1b[33m[vite]\x1b[0m No local settings file is applied.`);
     return null;
