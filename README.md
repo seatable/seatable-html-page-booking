@@ -47,13 +47,13 @@ Required fields:
 
 1. Install dependencies
 
-2. Add `/src/setting.local.js` (optional)
+2. Add `/src/setting.js` (optional)
 
 ```js
 export default {
   server: "",
   appUuid: "",
-  accessToken: "",
+  accountToken: "",
   pageId: "", // create an html page in universal app first
 };
 ```
