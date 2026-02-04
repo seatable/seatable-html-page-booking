@@ -15,8 +15,8 @@ class Context {
     return this.htmlPageSDK.listRows({ tableName, start, limit });
   }
 
-  addRow({ tableName, rowData, rowLinksData }) {
-    return this.htmlPageSDK.addRow({ tableName, rowData, rowLinksData });
+  addRow({ tableName, rowData }) {
+    return this.htmlPageSDK.addRow({ tableName, rowData });
   }
 }
 

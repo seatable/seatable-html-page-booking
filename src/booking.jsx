@@ -268,12 +268,9 @@ const Booking = () => {
         [bookingsNameColumn.name]: '',
         [bookingsStartTimeColumn.name]: startTime,
         [bookingsEndTimeColumn.name]: endTime,
+        [bookingsRelatedResourceColumn.name]: [resourceRowId],
       };
-      const rowLinksData = [{
-        link_column_name: linkColumnName,
-        other_rows_ids: [resourceRowId],
-      }];
-      return context.addRow({ tableName: BOOKINGS_TABLE_NAME, rowData, rowLinksData });
+      return context.addRow({ tableName: BOOKINGS_TABLE_NAME, rowData });
     },
     [
       bookingsNameColumn,
