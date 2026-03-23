@@ -38,7 +38,7 @@ export default [
       '/src/setting.local.js',
     ],
     rules: {
-      // 继承推荐规则
+      // extends recommends
       ...js.configs.recommended.rules,
       ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
