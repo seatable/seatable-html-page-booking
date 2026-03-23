@@ -27,7 +27,7 @@ const BookDialog = ({ resourceRow, selectedDate, times, getResourceName, toggle,
 
   const handleSubmit = useCallback(() => {
     if (!selectedStartTimeRef.current) {
-      setErrMessage('开始时间不能为空');
+      setErrMessage('Start time cannot be empty');
       return;
     }
 
@@ -55,15 +55,15 @@ const BookDialog = ({ resourceRow, selectedDate, times, getResourceName, toggle,
       toggle={toggle}
       className="book-dialog"
     >
-      <DTableModalHeader toggle={toggle}>{'预定'}</DTableModalHeader>
+      <DTableModalHeader toggle={toggle}>{'Booking'}</DTableModalHeader>
       <ModalBody>
         <Form>
           <FormGroup>
-            <Label for="new-book-resource-name">{'名称'}</Label>
+            <Label for="new-book-resource-name">{'Name'}</Label>
             <Input disabled id="new-book-resource-name" defaultValue={getResourceName(resourceRow)} />
           </FormGroup>
           <FormGroup>
-            <Label for="new-book-date">{'日期'}</Label>
+            <Label for="new-book-date">{'Date'}</Label>
             <Input disabled id="new-book-date" defaultValue={dayjs(selectedDate).format(DEFAULT_DATE_FORMAT)} />
           </FormGroup>
           <FormGroup>
@@ -73,10 +73,10 @@ const BookDialog = ({ resourceRow, selectedDate, times, getResourceName, toggle,
         {errMessage && <Alert color="danger" className="mt-2">{errMessage}</Alert>}
       </ModalBody>
       <ModalFooter>
-        <Button color="secondary" onClick={toggle}>{'取消'}</Button>
+        <Button color="secondary" onClick={toggle}>{'Cancel'}</Button>
         {isSaving ?
           <Button color="primary" disabled><Loading /></Button> :
-          <Button color="primary" onClick={handleSubmit}>{'提交'}</Button>
+          <Button color="primary" onClick={handleSubmit}>{'Submit'}</Button>
         }
       </ModalFooter>
     </Modal>

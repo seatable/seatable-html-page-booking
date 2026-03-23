@@ -10,6 +10,6 @@ export const handleExecutionCostExceedError = (error) => {
   if (!error || !error.response || !error.response.data || error.response.data.error_msg !== SERVER_ERROR_MSG.EXECUTION_COST_EXCEEDED) {
     return false;
   }
-  toaster.danger('查询的执行时间超出限制。无法加载数据。');
+  toaster.danger('Execution time of the query exceeds the limit. Data cannot be loaded.');
   return true;
 };

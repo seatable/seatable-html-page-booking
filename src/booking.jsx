@@ -379,16 +379,16 @@ const Booking = () => {
           <DTableEmptyTip
             src={noItemsTipImage}
             type="error"
-            text={'当前页面无法访问。请联系管理员。'}
+            text={'This page is currently unavailable. Please contact the administrator.'}
           />
         </div>
       )}
       {isShowBookSuccess && (
         <div className="tips-wrapper successfully-booking-tips">
-          <img alt={'预约成功'} src={successfullyBookingImage} />
-          <p className="successfully-booking-tips-text">{'预约成功'}</p>
+          <img alt={'Successfully booking'} src={successfullyBookingImage} />
+          <p className="successfully-booking-tips-text">{'Successfully booking'}</p>
           <div className="btn-booking-new-container">
-            <Button className="btn-booking-new" onClick={onBookingNew}>{'再次预约'}</Button>
+            <Button className="btn-booking-new" onClick={onBookingNew}>{'Booking a new one'}</Button>
           </div>
         </div>
       )}
