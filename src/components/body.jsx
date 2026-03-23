@@ -29,10 +29,10 @@ const BookingBody = ({ resourceRows, selectedDate, getResourceName, getResourceD
                 <div className="booking-resource" key={`booking-resource-${index}`}>
                   <div className="booking-resource-content">
                     <span className="booking-resource-name" title={resourceName}>{resourceName}</span>
-                    <span className={classnames('booking-badge-remaining ml-2 pl-1 pr-1', { 'fully-booked': isFullyBooked })}>{isFullyBooked ? '已约满' : `余 ${startTimesLen}`}</span>
+                    <span className={classnames('booking-badge-remaining ml-2 pl-1 pr-1', { 'fully-booked': isFullyBooked })}>{isFullyBooked ? 'Full' : `${startTimesLen} left`}</span>
                   </div>
                   <div className="booking-resource-more-operations ml-4">
-                    <button className={classnames('btn btn-book-now fw-normal', { 'disabled': isFullyBooked })} onClick={() => isFullyBooked ? {} : onToggleBook(resourceRow, startTimes)}>{'现在预定'}</button>
+                    <button className={classnames('btn btn-book-now fw-normal', { 'disabled': isFullyBooked })} onClick={() => isFullyBooked ? {} : onToggleBook(resourceRow, startTimes)}>{'Book now'}</button>
                   </div>
                 </div>
               );

@@ -15,10 +15,10 @@ const NOT_AVAILABLE_SCROLL_DIRECTION = {
 
 const scrollStep = 300;
 
-const LANG = 'zh-cn';
+const LANG = 'en';
 
 const getWeek = (date) => {
-  if (dayjs().isSame(date, DATE_UNIT.DAY)) return '今天';
+  if (dayjs().isSame(date, DATE_UNIT.DAY)) return 'Today';
   return dayjs(date).locale(LANG).format('ddd', 'en-gb');
 };
 
@@ -26,7 +26,7 @@ const Date = ({ dateObj, selectedDate, checkDateBookable, modifySelectedDate }) 
   const bookable = checkDateBookable(dateObj);
   const week = getWeek(dateObj);
   const day = dateObj.format('DD');
-  const bookStatus = bookable ? '可预约' : '已约满';
+  const bookStatus = bookable ? 'Bookable' : 'Full';
   return (
     <div
       className={classnames('booking-header-dates-selector-date p-2', { '--selected': dateObj.isSame(selectedDate, DATE_UNIT.DAY) })}
@@ -115,7 +115,7 @@ const DatePanel = ({ allDates, selectedDate, checkDateBookable, modifySelectedDa
 
   return (
     <div className="booking-header-dates-selector">
-      <div className="booking-header-dates-selector-year-month">{selectedDate.format('YYYY 年 MM 月')}</div>
+      <div className="booking-header-dates-selector-year-month">{selectedDate.format('YYYY-MM')}</div>
       <div className="booking-header-dates-selector-panel">
         <div className="booking-header-dates-selector-scroll-control booking-header-dates-selector-scroll-control-left-arrow p-1">
           <IconButton icon="left" disabled={scrollNotAvailable === NOT_AVAILABLE_SCROLL_DIRECTION.LEFT || scrollNotAvailable === NOT_AVAILABLE_SCROLL_DIRECTION.BOTH} onClick={() => handleManuallyScroll('left')} />

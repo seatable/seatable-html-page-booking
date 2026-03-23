@@ -223,12 +223,12 @@ const BookingContent = ({
   const submit = useCallback(async ({ resourceRow, startTime }, bookSuccessCallback, bookFailedCallback) => {
     const selectedResourceRowId = resourceRow && resourceRow._id;
     if (!selectedResourceRowId || !selectedDate || !startTime) {
-      toaster.danger('请选择可预约的时间段');
+      toaster.danger('Please select an available time slot.');
       bookFailedCallback && bookFailedCallback();
       return;
     }
     if (checkHasTimeOut(startTime, timeInterval)) {
-      toaster.danger('该时间段已被预定，请刷新后重试');
+      toaster.danger('This time slot has already been booked. Please refresh and try again.');
       bookFailedCallback && bookFailedCallback();
       return;
     }
@@ -237,7 +237,7 @@ const BookingContent = ({
     try {
       const latestBookingRows = await fetchLatestBookings();
       if (!latestBookingRows) {
-        toaster.danger('预定失败，请刷新后重试');
+        toaster.danger('Booking failed. Please refresh and try again.');
         bookFailedCallback && bookFailedCallback();
         return;
       }
@@ -245,7 +245,7 @@ const BookingContent = ({
       // check if the selected time is still available with latest data
       const isTimeBooked = checkHasTimeBooked(startTime, resourceRow, latestBookingRows);
       if (isTimeBooked) {
-        toaster.danger('该时间段已被预定，请刷新后重试');
+        toaster.danger('This time slot has already been booked. Please refresh and try again.');
         bookFailedCallback && bookFailedCallback();
         return;
       }
@@ -259,7 +259,7 @@ const BookingContent = ({
       onBookSuccess();
       bookSuccessCallback && bookSuccessCallback();
     } catch (error) {
-      toaster.danger('预定失败，请刷新后重试');
+      toaster.danger('Booking failed. Please refresh and try again.');
       bookFailedCallback && bookFailedCallback(error);
     }
   }, [timeInterval, selectedDate, addBooking, onBookSuccess, fetchLatestBookings, checkHasTimeBooked]);
@@ -272,7 +272,7 @@ const BookingContent = ({
           <DTableEmptyTip
             src={noItemsTipImage}
             type='error'
-            text={'没有可预约资源'}
+            text={'No bookable resources'}
           />
         </div>
       )}

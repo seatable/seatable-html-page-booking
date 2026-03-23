@@ -85,7 +85,7 @@ const BookStartTimeSelector = ({ times, modifySelectedStartTime }) => {
 
   return (
     <div className="module-book-start-time-selector">
-      <Label>{'开始时间'}</Label>
+      <Label>{'Start time'}</Label>
       <div
         ref={selectorSelectedContainerRef}
         className={`form-control ${isShowPopover ? 'form-control-active' : ''} selector-selected-container`}
